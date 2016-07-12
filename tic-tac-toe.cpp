@@ -1,0 +1,187 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const bool CLEAR_SCREEN = true;
+
+void clearScreen()
+{
+    cout << endl;
+
+    if (CLEAR_SCREEN)
+    {
+        cout << "\033c";
+    }
+
+    cout << endl;
+}
+
+void drawBoard(const vector <char> &board)
+{
+    clearScreen();
+    for (int i = 0; i < 9; i += 3)
+    {
+        cout << "  " << board.at(i) << "  |  " << board.at(i + 1) << "  |  "
+            << board.at(i + 2) << "  " << endl;
+        if (i < 6)
+            cout << "-----|-----|-----" << endl;
+    }
+    cout << endl;
+}
+
+
+void initVector(vector<char>& v)
+{
+    for(int i = 0; i < v.size(); i++)
+    {
+        v.at(i) = 'a' + i;
+    }
+}
+
+// converts a character representing a cell to associated vector index
+int convertPosition(char position)
+{
+    int index;
+    index = position - 'a';
+    return index;
+}
+
+// predicate function to determine if a spot in board is available.
+bool validPlacement(const vector <char> &board, int position)
+{
+    if(board.size() == 0 && position == 0)
+    {
+        return true;
+    }
+    if(position >= board.size() || position < 0)
+    {
+        return false;
+    }
+    if(board.at(position) == 'x' || board.at(position) == 'o')
+    {
+        return false;
+    }
+    return true;
+}
+
+
+// acquires a play from the user as to where to put her mark
+int getPlay(const vector <char> &board)
+{
+    char play;
+    int position;
+    cout << "Please choose a position: ";
+    cin >> play;
+    cout << endl;
+    
+    position = convertPosition(play);
+    
+    while(!validPlacement(board, position))
+    {
+        cout << "Please choose a position: ";
+        cin>> play;
+        cout << endl;
+        position = convertPosition(play);
+    }
+    return position;
+}
+
+
+// predicate function to determine if the game has been won
+bool gameWon(const vector <char> &board)
+{
+    if(board.at(0) == board.at(1) && board.at(1) == board.at(2))
+        return true;
+    else if(board.at(3) == board.at(4) && board.at(4) == board.at(5))
+        return true;
+    else if(board.at(6) == board.at(7) && board.at(7) == board.at(8))
+        return true;
+    else if(board.at(0) == board.at(3) && board.at(3) == board.at(6))
+        return true;
+    else if(board.at(1) == board.at(4) && board.at(4) == board.at(7))
+        return true;
+    else if(board.at(2) == board.at(5) && board.at(5) == board.at(8))
+        return true;
+    else if(board.at(0) == board.at(4) && board.at(4) == board.at(8))
+        return true;
+    else if(board.at(2) == board.at(4) && board.at(4) == board.at(6))
+        return true;
+    else
+        return false;
+}
+
+
+// predicate function to determine if the board is full
+bool boardFull(const vector <char> &board)
+{
+    int k = 0;
+    for(int i = 0; i < board.size(); i++)
+    {
+        if(board.at(i) == 'x' || board.at(i) == 'o')
+        {
+            k++;
+        }
+    }
+    if(k == board.size())
+    {
+        return true;
+    }
+    return false;
+}
+
+const int PLAYER1 = 0; // PLAYER1 is always first with 'x'
+const int PLAYER2 = 1; // PLAYER2 is 'o'
+
+
+int main()
+{
+    vector<char> board(9);
+    int curPlay;
+    int turn = PLAYER1;
+    
+    initVector(board);
+    drawBoard(board);
+    cout << endl;
+    
+    
+    while(!gameWon(board) && !boardFull(board))
+    {
+        curPlay = getPlay(board);
+        if(turn == PLAYER1)
+        {
+            board.at(curPlay) = 'x';
+            drawBoard(board);
+            cout << endl;
+            turn = PLAYER2;
+        }
+        else if (turn == PLAYER2)
+        {
+            board.at(curPlay) = 'o';
+            drawBoard(board);
+            cout << endl;
+            turn = PLAYER1;
+        }
+    }
+    
+    if(!gameWon(board))
+    {
+        cout << "No one wins" << endl;
+    }
+    else // gameWon(board)
+    {
+        if(turn == PLAYER2)
+        {
+            cout << "Player 1 (x's) wins!" << endl;
+        }
+        else // turn == PLAYER1
+        {
+            cout << "Player 2 (o's) wins!" << endl;
+        }
+    }
+    
+    return 0;
+}
+
+
+
+
